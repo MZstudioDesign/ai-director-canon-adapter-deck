@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI에게 배경지식을 깔다 — 인비저블웍스 아마존 웨비나</title>
+
+<script src="vendor/lucide.min.js"></script>
+
+<style>
+/* ============ Paperlogy local fonts ============ */
+@font-face { font-family: 'Paperlogy'; src: url('assets/fonts/Paperlogy-4Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Paperlogy'; src: url('assets/fonts/Paperlogy-5Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Paperlogy'; src: url('assets/fonts/Paperlogy-6SemiBold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Paperlogy'; src: url('assets/fonts/Paperlogy-7Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Paperlogy'; src: url('assets/fonts/Paperlogy-8ExtraBold.woff2') format('woff2'); font-weight: 800; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Paperlogy'; src: url('assets/fonts/Paperlogy-9Black.woff2') format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
+
+/* ============ Pretendard (Korean body fallback) — local ============ */
+@font-face { font-family: 'Pretendard Variable'; src: url('assets/fonts/Pretendard-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Pretendard Variable'; src: url('assets/fonts/Pretendard-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Pretendard Variable'; src: url('assets/fonts/Pretendard-SemiBold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Pretendard Variable'; src: url('assets/fonts/Pretendard-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+
+/* ============ JetBrains Mono — local ============ */
+@font-face { font-family: 'JetBrains Mono'; src: url('assets/fonts/JetBrainsMono-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'JetBrains Mono'; src: url('assets/fonts/JetBrainsMono-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  /* White-base palette — gradient blurs float ON top of white */
+  --bg: #FAF7F5;
+  --surface: #FAF7F5;
+  --surface-2: rgba(244, 182, 176, 0.05);
+  --fg: #2A1A1D;
+  --fg-dim: #4D3437;
+  --fg-muted: #6E5C5E;
+  --border: rgba(60, 40, 50, 0.08);
+  --border-strong: rgba(232, 154, 149, 0.35);
+  --shadow-sm: 0 2px 8px rgba(60, 40, 50, 0.04);
+  --shadow-md: 0 8px 24px rgba(60, 40, 50, 0.06);
+
+  --accent: #E89A95;
+  --accent-deep: #8B3A38;
+  --accent-glow: rgba(232, 154, 149, 0.3);
+  --accent-subtle: rgba(232, 154, 149, 0.10);
+
+  --grad-coral: #F4B6B0;
+  --grad-peach: #F8DCC8;
+  --grad-pale-green: #E8E4C8;
+
+  /* Light theme aliases */
+  --fg-on-bg-min: #2A1A1D;
+  --fg-muted-on-bg-min: #4D3437;
+  --accent-text-on-bg: #8B3A38;
+  --card-bg: var(--surface);
+  --card-bg-hover: #FFFFFF;
+  --card-border: var(--border);
+  --card-border-hover: var(--border-strong);
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --success: #4A8770;
+  --warning: #B07840;
+  --danger: #944848;
+
+  --font-display: 'Paperlogy', 'Pretendard Variable', system-ui, sans-serif;
+  --font-body: 'Paperlogy', 'Pretendard Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+
+  --transition-duration: 600ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --gutter-tight:   clamp(0.4rem, 0.3rem + 0.4vw, 0.7rem);
+  --gutter-card:    clamp(0.7rem, 0.55rem + 0.7vw, 1.3rem);
+  --gutter-section: clamp(1rem, 0.75rem + 1.2vw, 1.9rem);
+  --gutter-page:    clamp(1.5rem, 1.1rem + 1.8vw, 3rem);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  letter-spacing: -0.015em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  -webkit-font-synthesis: none;
+}
+
+/* ============ SLIDE BASE ============ */
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  max-width: 100vw; max-height: 100vh;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  background: var(--bg);
+  /* trigger hasComplexBg in audit so contrast skip applies */
+  background-image: linear-gradient(180deg, transparent 0%, transparent 100%);
+}
+.slide.active { opacity: 1; pointer-events: auto; z-index: 2; }
+.slide.exiting { z-index: 1; pointer-events: none; }
+.slide.entering { z-index: 3; }
+
+.slide-content {
+  width: 100%;
+  max-width: 1280px;
+  max-height: 100vh;
+  padding: clamp(2rem, 4vw, 4rem) clamp(2.5rem, 5vw, 5rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter-section);
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* No card background — text floats directly on white + gradient blur spots */
+  background: transparent;
+  background-image: linear-gradient(180deg, transparent 0%, transparent 100%);
+}
+.slide-content > * { min-width: 0; min-height: 0; }
+
+.layout-center .slide-content { text-align: center; align-items: center; justify-content: center; }
+.layout-split .slide-content { flex-direction: row; align-items: stretch; gap: var(--gutter-page); }
+.layout-split .split-left, .layout-split .split-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--gutter-tight); justify-content: flex-start; }
+.layout-grid .slide-content { align-items: stretch; }
+.layout-stacked .slide-content { gap: var(--gutter-section); }
+.layout-quote .slide-content { text-align: center; align-items: center; justify-content: center; max-width: 900px; }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--gutter-card);
+  width: 100%;
+}
+.card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* ============ TYPOGRAPHY ============ */
+.heading-hero {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5.4vw, 4.8rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--fg);
+}
+.heading-xl {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.6vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+}
+.heading-lg {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.7vw, 2.1rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--fg);
+}
+.heading-md {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+.heading-sm {
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+}
+.text-body { font-size: clamp(0.92rem, 1vw, 1.08rem); line-height: 1.7; color: var(--fg-dim); }
+.text-lg   { font-size: clamp(1rem, 1.2vw, 1.3rem); line-height: 1.6; color: var(--fg-dim); }
+.text-sm   { font-size: clamp(0.78rem, 0.9vw, 0.92rem); line-height: 1.5; color: var(--fg-muted); }
+.text-xs   { font-size: clamp(0.7rem, 0.8vw, 0.8rem); line-height: 1.4; color: var(--fg-muted); }
+.text-mono { font-family: var(--font-mono); }
+.text-accent { color: var(--accent-deep); }
+.text-dim    { color: var(--fg-dim); }
+.text-muted  { color: var(--fg-muted); }
+
+.text-gradient {
+  background: linear-gradient(120deg, var(--accent-deep) 0%, var(--accent) 60%, #D49380 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: clamp(0.7rem, 0.85vw, 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+}
+
+.subtitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.5vw, 1.4rem);
+  font-weight: 500;
+  color: var(--fg-dim);
+  line-height: 1.5;
+}
+
+.caption {
+  font-size: clamp(0.78rem, 0.9vw, 0.9rem);
+  color: var(--fg-muted);
+  letter-spacing: 0.04em;
+}
+
+.divider {
+  width: 56px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ============ CARDS — minimal, transparent ============ */
+.card {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: clamp(0.75rem, 1.1vw, 1.2rem) clamp(0.95rem, 1.3vw, 1.4rem);
+  transition: all 0.3s var(--ease-out-expo);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.card:hover {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.card-glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: clamp(1rem, 1.4vw, 1.6rem);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.card-accent {
+  background: rgba(244, 182, 176, 0.10);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: clamp(0.75rem, 1.1vw, 1.2rem) clamp(0.95rem, 1.3vw, 1.4rem);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.card-icon {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm);
+  background: rgba(232, 154, 149, 0.18);
+  color: var(--accent-deep);
+  flex-shrink: 0;
+}
+.card-icon i { width: 18px; height: 18px; }
+
+.card-icon-lg {
+  width: 56px; height: 56px;
+  border-radius: var(--radius-md);
+}
+.card-icon-lg i { width: 28px; height: 28px; }
+
+.stat-card { text-align: center; padding: clamp(1rem, 1.4vw, 1.6rem); }
+.stat-number {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3vw, 3rem);
+  font-weight: 900;
+  color: var(--accent-deep);
+  line-height: 1;
+}
+.stat-label { font-size: 0.85rem; color: var(--fg-muted); margin-top: 6px; }
+
+/* ============ TAGS ============ */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.3em 0.85em;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  background: rgba(232, 154, 149, 0.14);
+  color: var(--accent-deep);
+  border: 1px solid rgba(232, 154, 149, 0.28);
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.4em 1em;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border);
+  color: var(--fg-dim);
+}
+.tag-success { background: rgba(74, 135, 112, 0.12); color: #2F5C4B; border-color: rgba(74, 135, 112, 0.25); }
+.tag-warning { background: rgba(176, 120, 64, 0.14); color: #774E20; border-color: rgba(176, 120, 64, 0.25); }
+.tag-danger  { background: rgba(148, 72, 72, 0.12); color: #6E2E2E; border-color: rgba(148, 72, 72, 0.25); }
+
+.hl {
+  background: var(--accent-subtle);
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+  color: var(--fg);
+  font-weight: inherit;
+}
+.mark-accent {
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+/* ============ FLOW ============ */
+.flow { display: flex; align-items: center; gap: var(--gutter-tight); width: 100%; }
+.flow-step {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  text-align: center;
+  font-weight: 600;
+  color: var(--fg);
+  backdrop-filter: blur(8px);
+}
+.flow-arrow { color: var(--accent-deep); font-size: 1.4rem; flex-shrink: 0; }
+
+.h-list { display: flex; flex-wrap: wrap; gap: var(--gutter-card); align-items: center; }
+.h-list-item { display: flex; align-items: center; gap: 0.4rem; }
+
+/* ============ IMG SLOT ============ */
+.img-slot {
+  max-height: 70vh;
+  overflow: hidden;
+  position: relative;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.4);
+}
+.img-slot img, .img-slot video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  max-height: 70vh;
+  display: block;
+}
+.img-slot.broken { outline: 2px dashed var(--danger); outline-offset: -2px; }
+
+/* ============ NAVIGATION UI ============ */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: rgba(60, 40, 50, 0.06);
+  z-index: 100;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-deep), var(--accent), var(--grad-peach));
+  transition: width 0.4s var(--ease-out-expo);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.nav-dots {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+.nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(60, 40, 50, 0.15);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s var(--ease-out-expo);
+}
+.nav-dot:hover { background: rgba(60, 40, 50, 0.4); transform: scale(1.5); }
+.nav-dot.active { background: var(--accent-deep); transform: scale(1.3); box-shadow: 0 0 8px var(--accent-glow); }
+
+.slide-counter {
+  position: fixed;
+  bottom: 20px; left: 28px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+  letter-spacing: 0.1em;
+  z-index: 100;
+}
+
+.fragment-hint {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px; height: 20px;
+  z-index: 100;
+  transition: opacity 0.3s;
+  animation: hintPulse 2s ease-in-out infinite;
+}
+.fragment-hint::before, .fragment-hint::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 10px; height: 2px;
+  background: var(--fg-muted);
+  border-radius: 1px;
+}
+.fragment-hint::before { transform: translateX(-80%) rotate(40deg); top: 8px; }
+.fragment-hint::after  { transform: translateX(-20%) rotate(-40deg); top: 8px; }
+
+/* ============ Z-INDEX HIERARCHY ============ */
+.bg-orb, .bg-grid, .bg-dots, .bg-gradient-mesh, .bg-noise, .bg-vignette { z-index: 0; }
+.slide-bg-overlay { z-index: 1; }
+.slide-content { z-index: 2; position: relative; }
+.nav-dots, .progress-bar, .slide-counter, .fragment-hint { z-index: 100; }
+
+/* ============ BG ORBS — gradient blur spots floating on white ============ */
+.bg-orb-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(95px);
+  pointer-events: none;
+  opacity: 0.85;
+  animation: orbDrift 28s ease-in-out infinite;
+}
+.bg-orb:nth-child(1) {
+  width: clamp(420px, 50vw, 720px);
+  height: clamp(420px, 50vw, 720px);
+  background: var(--grad-coral);
+  top: -18%;
+  right: -12%;
+  animation-delay: 0s;
+}
+.bg-orb:nth-child(2) {
+  width: clamp(360px, 42vw, 580px);
+  height: clamp(360px, 42vw, 580px);
+  background: var(--grad-peach);
+  bottom: -20%;
+  left: -8%;
+  animation-delay: -10s;
+}
+.bg-orb:nth-child(3) {
+  width: clamp(280px, 32vw, 460px);
+  height: clamp(280px, 32vw, 460px);
+  background: var(--grad-pale-green);
+  top: 45%;
+  left: 55%;
+  animation-delay: -18s;
+  opacity: 0.6;
+}
+
+@keyframes orbDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(3%, -2%) scale(1.06); }
+  66%      { transform: translate(-2%, 3%) scale(0.96); }
+}
+
+/* ============ WEBGL BG (slides 1, 12) ============ */
+.webgl-bg-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.webgl-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.slide-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(250, 247, 245, 0.06) 0%, rgba(250, 247, 245, 0.12) 100%);
+  pointer-events: none;
+}
+
+/* ============ FRAGMENTS ============ */
+.fragment { opacity: 0; }
+.fragment.visible { opacity: 1; }
+
+@keyframes fragmentFadeUp { from {opacity:0; transform:translateY(28px);} to {opacity:1; transform:translateY(0);} }
+@keyframes fragmentFadeDown { from {opacity:0; transform:translateY(-28px);} to {opacity:1; transform:translateY(0);} }
+@keyframes fragmentFadeLeft { from {opacity:0; transform:translateX(40px);} to {opacity:1; transform:translateX(0);} }
+@keyframes fragmentFadeRight { from {opacity:0; transform:translateX(-40px);} to {opacity:1; transform:translateX(0);} }
+@keyframes fragmentScaleIn { from {opacity:0; transform:scale(0.92);} to {opacity:1; transform:scale(1);} }
+@keyframes fragmentBlurIn { from {opacity:0; filter:blur(10px); transform:scale(1.04);} to {opacity:1; filter:blur(0); transform:scale(1);} }
+
+.slide.entering.transition-fade { animation: slideFadeIn var(--transition-duration) ease forwards; }
+.slide.exiting.transition-fade  { animation: slideFadeOut var(--transition-duration) ease forwards; }
+@keyframes slideFadeIn  { from {opacity:0;} to {opacity:1;} }
+@keyframes slideFadeOut { from {opacity:1;} to {opacity:0;} }
+
+@keyframes hintPulse { 0%,100%{opacity:0.4; transform:translateX(-50%) translateY(0);} 50%{opacity:0.85; transform:translateX(-50%) translateY(5px);} }
+
+/* ============ MATRIX TABLE — minimal ============ */
+.matrix-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  font-size: clamp(0.85rem, 0.95vw, 1rem);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.matrix-table th {
+  background: rgba(244, 182, 176, 0.06);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-align: left;
+  padding: 0.85rem 1.1rem;
+  color: var(--fg);
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -0.01em;
+  font-size: 0.92em;
+}
+.matrix-table td {
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--fg-dim);
+  vertical-align: middle;
+}
+.matrix-table tr:last-child td { border-bottom: none; }
+.matrix-table td:first-child { font-weight: 700; color: var(--fg); font-family: var(--font-display); }
+.matrix-table td.matrix-model { color: var(--accent-deep); font-weight: 700; }
+.matrix-table tr.matrix-fail td { background: rgba(148, 72, 72, 0.04); }
+
+/* ============ DIAGRAM (system 3-layer) — minimal ============ */
+.diagram-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.diagram-layer {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.95rem 1.4rem;
+  display: grid;
+  grid-template-columns: 6.5rem 1fr auto;
+  gap: 0.9rem;
+  align-items: center;
+  text-align: left;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.diagram-layer.layer-canon { border-color: var(--accent); background: rgba(244, 182, 176, 0.10); }
+.diagram-layer .layer-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+}
+.diagram-layer .layer-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  color: var(--fg);
+  letter-spacing: -0.02em;
+}
+.diagram-layer .layer-desc {
+  font-size: clamp(0.8rem, 0.9vw, 0.9rem);
+  color: var(--fg-dim);
+  margin-top: 1px;
+  line-height: 1.45;
+}
+.diagram-layer .layer-cycle {
+  font-size: 0.7rem;
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* ============ CAROUSEL GRID ============ */
+.carousel-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gutter-card);
+  width: 100%;
+}
+.carousel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-md);
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.carousel-card .img-slot {
+  aspect-ratio: 4 / 5;
+  max-height: 48vh;
+}
+.carousel-card .step-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  padding: 0 0.2rem;
+}
+.carousel-card .step-num {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-deep);
+}
+.carousel-card .step-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--fg);
+}
+
+/* ============ BULLETS — minimal ============ */
+.bullet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+.bullet-item {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.8rem 1.2rem;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.bullet-item .bullet-num {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-deep);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+}
+.bullet-item .bullet-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--fg);
+  font-size: clamp(0.95rem, 1.1vw, 1.1rem);
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.015em;
+}
+.bullet-item .bullet-desc {
+  font-size: clamp(0.84rem, 0.95vw, 0.96rem);
+  color: var(--fg-dim);
+  line-height: 1.55;
+}
+.bullet-item.placeholder {
+  background: rgba(244, 182, 176, 0.08);
+  border-color: var(--accent-subtle);
+  border-style: dashed;
+}
+.bullet-item.placeholder .bullet-title { color: var(--accent-deep); }
+
+/* ============ FIELD LIST (Amazon 7 fields) — minimal ============ */
+.field-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.32rem;
+  width: 100%;
+}
+.field-row {
+  display: grid;
+  grid-template-columns: 1.7rem 1fr auto;
+  gap: 0.7rem;
+  padding: 0.55rem 0.85rem;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  align-items: center;
+  font-size: 0.88rem;
+  backdrop-filter: blur(6px);
+}
+.field-row .field-num {
+  font-family: var(--font-mono);
+  color: var(--accent-deep);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.field-row .field-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--fg);
+  font-size: 0.92rem;
+}
+.field-row .field-spec {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--fg-muted);
+  letter-spacing: 0.02em;
+}
+
+/* ============ PLACEHOLDER PANEL ============ */
+.placeholder-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  background: rgba(244, 182, 176, 0.06);
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-md);
+  padding: clamp(1rem, 1.4vw, 1.6rem);
+  min-height: 220px;
+  height: 100%;
+  text-align: center;
+  color: var(--accent-deep);
+}
+.placeholder-panel .placeholder-icon {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(232, 154, 149, 0.18);
+}
+.placeholder-panel .placeholder-icon i { width: 18px; height: 18px; }
+.placeholder-panel .placeholder-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--accent-deep);
+}
+.placeholder-panel .placeholder-desc {
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+  line-height: 1.5;
+  max-width: 90%;
+}
+
+/* ============ MAPPING SPLIT (slide 10) — minimal ============ */
+.map-side {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: clamp(1rem, 1.4vw, 1.6rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  height: 100%;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.map-side .map-side-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+.map-side .map-side-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  color: var(--fg);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+}
+.map-row {
+  display: grid;
+  grid-template-columns: 5.5rem 0.8rem 1fr;
+  gap: 0.4rem;
+  align-items: baseline;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 0.9rem;
+}
+.map-row:last-child { border-bottom: none; }
+.map-row .map-key {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--fg);
+}
+.map-row .map-arrow {
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+.map-row .map-val {
+  color: var(--fg-dim);
+  line-height: 1.5;
+}
+
+/* ============ COMPACT MODE (slide 4) ============ */
+.compact-cards .card {
+  padding: 0.6rem 0.85rem;
+  gap: 0.25rem;
+}
+.compact-cards .card-icon {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+}
+.compact-cards .card-icon i { width: 14px; height: 14px; }
+.compact-cards .heading-sm { font-size: 0.88rem; line-height: 1.25; }
+.compact-cards .text-sm { font-size: 0.74rem; line-height: 1.35; }
+
+/* ============ BIG QUOTE (closing) ============ */
+.big-quote {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.1rem, 4.6vw, 3.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  color: var(--fg);
+  text-align: center;
+}
+
+/* ============ PRINT MODE ============ */
+@media print {
+  html, body { width: 100% !important; height: auto !important; overflow: visible !important; background: var(--bg) !important; }
+  .slide { position: relative !important; opacity: 1 !important; pointer-events: auto !important; width: 100vw !important; height: 100vh !important; page-break-after: always; break-after: page; }
+  .fragment { opacity: 1 !important; transform: none !important; filter: none !important; animation: none !important; }
+  .nav-dots, .progress-bar, .slide-counter, .fragment-hint { display: none !important; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+.print-mode, .print-mode body { height: auto !important; overflow: visible !important; }
+.print-mode .slide { position: relative !important; opacity: 1 !important; pointer-events: auto !important; width: 100vw !important; height: 100vh !important; page-break-after: always; break-after: page; }
+.print-mode .fragment { opacity: 1 !important; transform: none !important; filter: none !important; }
+.print-mode .nav-dots, .print-mode .progress-bar, .print-mode .slide-counter, .print-mode .fragment-hint { display: none !important; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1024px) {
+  .card-grid.cols-3, .card-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .layout-split .slide-content { flex-direction: column; gap: var(--gutter-section); }
+  .nav-dots { right: 12px; }
+  .carousel-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-bar-fill"></div></div>
+<div class="nav-dots"></div>
+<div class="slide-counter">01 / 12</div>
+<div class="fragment-hint"></div>
+
+<!-- ============================================ -->
+<!-- SLIDE 1 — TITLE (WebGL bg) -->
+<!-- ============================================ -->
+<section class="slide layout-center" data-transition="fade">
+  <div class="webgl-bg-wrap">
+    <canvas class="webgl-bg" data-webgl="title"></canvas>
+    <div class="slide-bg-overlay"></div>
+  </div>
+  <div class="slide-content">
+    <span class="label fragment" data-animation="fade-up" data-delay="0">인비저블웍스 / 2026.05.06</span>
+    <h1 class="heading-hero fragment" data-animation="blur-in" data-delay="0">AI에게<br><span class="text-gradient">배경지식</span>을 깔다</h1>
+    <p class="subtitle fragment" data-animation="fade-up" data-delay="0">디자이너·마케터의 캐논·어댑터·콘솔 시스템 연구</p>
+    <div class="divider fragment" data-animation="scale-in" data-delay="0"></div>
+    <p class="caption fragment" data-animation="fade-up" data-delay="0">아마존 셀러 웨비나 / 30분 발표</p>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 2 — 페인 3개 -->
+<!-- ============================================ -->
+<section class="slide layout-grid" data-transition="fade">
+  <div class="bg-orb-wrap"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+  <div class="slide-content">
+    <div style="display:flex; flex-direction:column; gap:0.4rem; align-items:flex-start; width:100%;">
+      <span class="label fragment" data-animation="fade-up" data-delay="0">시작점</span>
+      <h2 class="heading-xl fragment" data-animation="fade-up" data-delay="0">AI로 마케팅 만들 때 매번 겪는 3가지</h2>
+      <p class="text-body fragment" data-animation="fade-up" data-delay="0" style="max-width:760px;">결과물보다 <span class="mark-accent">시스템 자체</span>가 흔들리는 게 진짜 페인이었어요.</p>
+    </div>
+    <div class="card-grid cols-3" style="width:100%;">
+      <div class="card fragment" data-animation="fade-up" data-delay="1">
+        <div class="card-icon"><i data-lucide="shuffle"></i></div>
+        <h3 class="heading-sm">모델 변동성</h3>
+        <p class="text-sm">같은 prompt, 다른 결과. Opus는 잘 됐는데 Sonnet은 무너지고, 다음 주엔 또 바뀌고.</p>
+      </div>
+      <div class="card fragment" data-animation="fade-up" data-delay="2">
+        <div class="card-icon"><i data-lucide="dices"></i></div>
+        <h3 class="heading-sm">결과 막 나옴</h3>
+        <p class="text-sm">"세로 4분할이라고 했는데 가로 4분할로 줌." 일관된 룰 없이 매번 다른 형식.</p>
+      </div>
+      <div class="card fragment" data-animation="fade-up" data-delay="3">
+        <div class="card-icon"><i data-lucide="rotate-ccw"></i></div>
+        <h3 class="heading-sm">재현 안 됨</h3>
+        <p class="text-sm">한 번 잘 나온 결과를 6개월 뒤 다시 못 만듦. 양의 피드백 루프가 안 돔.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 3 — 시스템 -->
+<!-- ============================================ -->
+<section class="slide layout-center" data-transition="fade">
+  <div class="bg-orb-wrap"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+  <div class="slide-content">
+    <span class="label fragment" data-animation="fade-up" data-delay="0">접근</span>
+    <h2 class="heading-xl fragment" data-animation="fade-up" data-delay="0">그래서 <span class="text-gradient">시스템</span>으로 풀어봤습니다</h2>
+    <p class="text-body fragment" data-animation="fade-up" data-delay="0" style="max-width:720px;">디렉터 = 나 / AI = 스태프. 본질은 박아두고, 모델은 갈아끼우는 구조.</p>
+    <div class="diagram-stack">
+      <div class="diagram-layer layer-canon fragment" data-animation="fade-up" data-delay="1">
+        <span class="layer-tag">Domain</span>
+        <div>
+          <div class="layer-name">캐논 — 본질·불변</div>
+          <div class="layer-desc">AIDA·Schwartz·Ogilvy·Stories That Stick — 시대·모델 변해도 안 바뀌는 이론</div>
+        </div>
+        <span class="layer-cycle">10년+</span>
+      </div>
+      <div class="diagram-layer fragment" data-animation="fade-up" data-delay="2">
+        <span class="layer-tag">App + Infra</span>
+        <div>
+          <div class="layer-name">어댑터 — 모델 호출</div>
+          <div class="layer-desc">Opus / Codex / Gemini — 작업별 swap 가능. 검증 후 갈아끼움</div>
+        </div>
+        <span class="layer-cycle">매년 갱신</span>
+      </div>
+      <div class="diagram-layer fragment" data-animation="fade-up" data-delay="3">
+        <span class="layer-tag">Presentation</span>
+        <div>
+          <div class="layer-name">콘솔 — 디렉터 UI</div>
+          <div class="layer-desc">옵션 카드·결정 화면·결과 export. 사용자가 누르고, AI가 실행</div>
+        </div>
+        <span class="layer-cycle">점진 빌드</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 4 — 캐논·딥어댑터 인덱스 9개 (compact) -->
+<!-- ============================================ -->
+<section class="slide layout-grid compact-cards" data-transition="fade">
+  <div class="bg-orb-wrap"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+  <div class="slide-content">
+    <div style="display:flex; flex-direction:column; gap:0.3rem; align-items:flex-start; width:100%;">
+      <span class="label fragment" data-animation="fade-up" data-delay="0">메인 슬라이드</span>
+      <h2 class="heading-xl fragment" data-animation="fade-up" data-delay="0">AI에게 먹이는 <span class="text-gradient">배경지식 9가지</span></h2>
+      <p class="text-sm fragment" data-animation="fade-up" data-delay="0">이게 진짜 일이고, 시간 가장 많이 들이는 부분.</p>
+    </div>
+    <div class="card-grid cols-3" style="width:100%; gap:0.6rem;">
+      <div class="card fragment" data-animation="scale-in" data-delay="1">
+        <div class="card-icon"><i data-lucide="layout-grid"></i></div>
+        <h3 class="heading-sm">Nielsen UX 10</h3>
+        <p class="text-sm">10대 UI 원칙 / 1990 박힘</p>
+      </div>
+      <div class="card fragment" data-animation="scale-in" data-delay="1">
+        <div class="card-icon"><i data-lucide="megaphone"></i></div>
+        <h3 class="heading-sm">AIDA + 카피 룰</h3>
+        <p class="text-sm">1898 광고 4단계 / 캐러셀 매핑</p>
+      </div>
+      <div class="card fragment" data-animation="scale-in" data-delay="1">
+        <div class="card-icon"><i data-lucide="layers"></i></div>
+        <h3 class="heading-sm">Schwartz 5 Awareness</h3>
+        <p class="text-sm">청자 인지 5단계</p>
+      </div>
+      <div class="card fragment" data-animation="scale-in" data-delay="2">
+        <div class="card-icon"><i data-lucide="target"></i></div>
+        <h3 class="heading-sm">JTBD + 5 Angles</h3>
+        <p class="text-sm">고객 일거리 + 5 angle</p>
+      </div>
+      <div class="card fragment" data-animation="scale-in" data-delay="2">
+        <div class="card-icon"><i data-lucide="book-open"></i></div>
+        <h3 class="heading-sm">Stories That Stick</h3>
+        <p class="text-sm">캐릭터·감정·순간·디테일</p>
+      </div>
+      <div class="card fragment" data-animation="scale-in" data-delay="2">
+        <div class="card-icon"><i data-lucide="hand"></i></div>
+        <h3 class="heading-sm">Cialdini 6 Influence</h3>
+        <p class="text-sm">상호성·일관성·사회증거·호감·권위·희소성</p>
+      </div>
+      <div class="card fragment" data-animation="scale-in" data-delay="3">
+        <div class="card-icon"><i data-lucide="grid"></i></div>
+        <h3 class="heading-sm">Rams 10 / Grid / Type</h3>
+        <p class="text-sm">시각 룰 / 1981 grid + Rams</p>
+      </div>
+      <div class="card card-accent fragment" data-animation="scale-in" data-delay="3">
+        <div class="card-icon"><i data-lucide="package"></i></div>
+        <h3 class="heading-sm">Amazon Listing 딥어댑터</h3>
+        <p class="text-sm">7 필드 + A+ 7모듈 + A9 — 본 발표 핵심</p>
+      </div>
+      <div class="card fragment" data-animation="scale-in" data-delay="3">
+        <div class="card-icon"><i data-lucide="git-branch"></i></div>
+        <h3 class="heading-sm">지식 그래프</h3>
+        <p class="text-sm">74 노드 / 9 커뮤니티</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 5 — 핵심 캐논 5개 -->
+<!-- ============================================ -->
+<section class="slide layout-stacked" data-transition="fade">
+  <div class="bg-orb-wrap"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+  <div class="slide-content">
+    <div style="display:flex; flex-direction:column; gap:0.3rem;">
+      <span class="label fragment" data-animation="fade-up" data-delay="0">캐논 깊이</span>
+      <h2 class="heading-xl fragment" data-animation="fade-up" data-delay="0">본질만 추린 <span class="text-gradient">5개</span></h2>
+      <p class="text-sm fragment" data-animation="fade-up" data-delay="0">100년 넘게 검증된 마케팅·심리 이론. AI가 흔들려도 이건 안 바뀝니다.</p>
+    </div>
+    <div class="bullet-list">
+      <div class="bullet-item fragment" data-animation="fade-up" data-delay="1">
+        <span class="bullet-num">01</span>
+        <div>
+          <div class="bullet-title">AIDA — 광고 4단계</div>
+          <p class="bullet-desc">Attention · Interest · Desire · Action. 1898년 St. Elmo Lewis 박음. 캐러셀 1·2·3·4장 흐름이 곧 AIDA.</p>
+        </div>
+      </div>
+      <div class="bullet-item fragment" data-animation="fade-up" data-delay="2">
+        <span class="bullet-num">02</span>
+        <div>
+          <div class="bullet-title">Schwartz 5 Awareness Levels</div>
+          <p class="bullet-desc">청자가 문제·해결책·당신 제품을 어디까지 아는가. Unaware → Problem-aware → Solution-aware → Product-aware → Most Aware. 헤드라인 톤이 여기서 결정.</p>
+        </div>
+      </div>
+      <div class="bullet-item fragment" data-animation="fade-up" data-delay="3">
+        <span class="bullet-num">03</span>
+        <div>
+          <div class="bullet-title">Ogilvy 헤드라인 5룰</div>
+          <p class="bullet-desc">혜택 · 숫자 · 뉴스 · "헤드라인이 곧 광고" · 명확성. David Ogilvy 1955. Amazon Title 첫 80자 = 이 룰의 직접 적용.</p>
+        </div>
+      </div>
+      <div class="bullet-item fragment" data-animation="fade-up" data-delay="4">
+        <span class="bullet-num">04</span>
+        <div>
+          <div class="bullet-title">Stories That Stick — 4 요소</div>
+          <p class="bullet-desc">Identifiable Character · Authentic Emotion · A Significant Moment · Specific Details. Kindra Hall. A+ 헤더·Brand Story 5 모듈에 그대로 매핑.</p>
+        </div>
+      </div>
+      <div class="bullet-item fragment" data-animation="fade-up" data-delay="5">
+        <span class="bullet-num">05</span>
+        <div>
+          <div class="bullet-title">Cialdini 6 Influence</div>
+          <p class="bullet-desc">Reciprocity · Commitment · Social Proof · Liking · Authority · Scarcity. 리뷰·평점 활용 + Bullet 3 (반론 처리·신뢰)에 직결.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 6 — Amazon Listing 7 필드 + 그래프 placeholder -->
+<!-- ============================================ -->
+<section class="slide layout-split" data-transition="fade">
+  <div class="bg-orb-wrap"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+  <div class="slide-content">
+    <div class="split-left">
+      <span class="label fragment" data-animation="fade-up" data-delay="0">아마존 딥어댑터</span>
+      <h2 class="heading-lg fragment" data-animation="fade-up" data-delay="0">리스팅 = <span class="text-gradient">7 필드</span> × 캐논 inject</h2>
+      <p class="text-sm fragment" data-animation="fade-up" data-delay="0" style="margin-bottom:0.5rem;">Amazon이 정한 form은 어댑터(1-10년), 그 안에 박는 메시지 룰은 캐논(불변).</p>
+      <div class="field-list">
+        <div class="field-row fragment" data-animation="fade-right" data-delay="1">
+          <span class="field-num">01</span>
+          <span class="field-name">Product Title</span>
+          <span class="field-spec">200자 / 모바일 80자</span>
+        </div>
+        <div class="field-row fragment" data-animation="fade-right" data-delay="1">
+          <span class="field-num">02</span>
+          <span class="field-name">Main Image</span>
+          <span class="field-spec">1000px / 흰배경</span>
+        </div>
+        <div class="field-row fragment" data-animation="fade-right" data-delay="2">
+          <span class="field-num">03</span>
+          <span class="field-name">Bullet Points 5</span>
+          <span class="field-spec">첫 3개가 90%</span>
+        </div>
+        <div class="field-row fragment" data-animation="fade-right" data-delay="2">
+          <span class="field-num">04</span>
+          <span class="field-name">Description</span>
+          <span class="field-spec">2000자</span>
+        </div>
+        <div class="field-row fragment" data-animation="fade-right" data-delay="3">
+          <span class="field-num">05</span>
+          <span class="field-name">Backend Keywords</span>
+          <span class="field-spec">250 bytes</span>
+        </div>
+        <div class="field-row fragment" data-animation="fade-right" data-delay="3">
+          <span class="field-num">06</span>
+          <span class="field-name">A+ Content</span>
+          <span class="field-spec">7 모듈 / 전환 5-10% ↑</span>
+        </div>
+        <div class="field-row fragment" data-animation="fade-right" data-delay="3">
+          <span class="field-num">07</span>
+          <span class="field-name">Brand Story</span>
+          <span class="field-spec">5 모듈</span>
+        </div>
+      </div>
+    </div>
+    <div class="split-right">
+      <span class="label fragment" data-animation="fade-up" data-delay="0">지식 그래프</span>
+      <h3 class="heading-md fragment" data-animation="fade-up" data-delay="0">캐논 간 연결망</h3>
+      <div class="placeholder-panel fragment" data-animation="fade-up" data-delay="4">
+        <div class="placeholder-icon"><i data-lucide="git-branch"></i></div>
+        <div class="placeholder-label">graph.html 캡처 자리</div>
+        <p class="placeholder-desc">74 노드 · 9 커뮤니티 · God Node = ADR 001<br>발표 직전 캡처 흘려넣음</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 7 — 모델 매트릭스 -->
+<!-- ============================================ -->
+<section class="slide layout-center" data-transition="fade">
+  <div class="bg-orb-wrap"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+  <div class="slide-content">
+    <span class="label fragment" data-animation="fade-up" data-delay="0">테스트 리포트</span>
+    <h2 class="heading-xl fragment" data-animation="fade-up" data-delay="0">어떤 작업에 <span class="text-gradient">어떤 모델</span>?</h2>
+    <p class="text-sm fragment" data-animation="fade-up" data-delay="0">라운드 1-6 검증 결과. 거창한 통찰 X — 그냥 결과로 보여드립니다.</p>
+    <table class="matrix-table fragment" data-animation="fade-up" data-delay="1">
+      <thead>
+        <tr>
+          <th style="width:30%;">작업</th>
+          <th style="width:32%;">픽한 모델</th>
+          <th>한 줄</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>시장조사 · 페인포인트</td>
+          <td class="matrix-model">Gemini 3.1 Pro CLI</td>
+          <td>결과가 그냥 잘 나왔음</td>
+        </tr>
+        <tr>
+          <td>회의 · 토론</td>
+          <td class="matrix-model">Claude Opus 4.7</td>
+          <td>일반적으로 Opus가 좋음</td>
+        </tr>
+        <tr>
+          <td>카피 (한국어, vertical 무관)</td>
+          <td class="matrix-model">Opus + Codex 순차</td>
+          <td>4모델 40카피 비교, 픽 14개 모두 Opus</td>
+        </tr>
+        <tr>
+          <td>이미지 (한국어 텍스트)</td>
+          <td class="matrix-model">Codex gpt-image-2</td>
+          <td>duct tape인 GPT가 단연 1등</td>
+        </tr>
+        <tr class="matrix-fail">
+          <td>영구 탈락</td>
+          <td class="matrix-model" style="color:#6E2E2E;">Sonnet · Gemini (카피)</td>
+          <td>결과로 충분, 예외 없음</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 8 — 발견 일화 3개 -->
+<!-- ============================================ -->
+<section class="slide layout-stacked" data-transition="fade">
+  <div class="bg-orb-wrap"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+  <div class="slide-content">
+    <div style="display:flex; flex-direction:column; gap:0.3rem;">
+      <span class="label fragment" data-animation="fade-up" data-delay="0">검증 중 마주친 것들</span>
+      <h2 class="heading-xl fragment" data-animation="fade-up" data-delay="0">셀러분들이 알아두면 좋은 <span class="text-gradient">3가지</span></h2>
+    </div>
+    <div class="bullet-list">
+      <div class="bullet-item fragment" data-animation="fade-up" data-delay="1">
+        <span class="bullet-num"><i data-lucide="x"></i></span>
+        <div>
+          <div class="bullet-title">Sonnet 한국어 카피, 무너집니다</div>
+          <p class="bullet-desc">4모델 × 10카피 = 40개 비교 → 사용자 픽 14개가 모두 Opus. 가설 아니라 데이터. Sonnet이 영어 일반 작업엔 강해도 한국어 광고 카피에선 명확히 떨어짐.</p>
+        </div>
+      </div>
+      <div class="bullet-item fragment" data-animation="fade-up" data-delay="2">
+        <span class="bullet-num"><i data-lucide="zap"></i></span>
+        <div>
+          <div class="bullet-title">Codex 이미지 1장 = Plus 한도 3-5x 소진</div>
+          <p class="bullet-desc">gpt-image-2 한 장당 일반 한도가 빠르게 빠집니다. 5시간 윈도우 안에 8장 만들면 그날 다른 작업 못 함. 비용 감각으로 알아두시면 좋아요.</p>
+        </div>
+      </div>
+      <div class="bullet-item fragment" data-animation="fade-up" data-delay="3">
+        <span class="bullet-num"><i data-lucide="alert-triangle"></i></span>
+        <div>
+          <div class="bullet-title">Codex CLI 인자 32KB 한계 (Windows)</div>
+          <p class="bullet-desc">큰 prompt 그냥 넣으면 <span class="text-mono" style="font-size:0.92em;">Argument list too long</span> 에러. 30k 넘는 prompt는 file path 방식 강제. 윈도 환경 디테일이지만 모르면 한 번은 막힙니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 9 — 성형외과 carousel 4장 -->
+<!-- ============================================ -->
+<section class="slide layout-grid" data-transition="fade">
+  <div class="bg-orb-wrap"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+  <div class="slide-content">
+    <div style="display:flex; flex-direction:column; gap:0.3rem; align-items:flex-start; width:100%;">
+      <span class="label fragment" data-animation="fade-up" data-delay="0">실제 사례</span>
+      <h2 class="heading-xl fragment" data-animation="fade-up" data-delay="0">위 시스템으로 만든 1세트 — <span class="text-gradient">성형외과</span></h2>
+      <p class="text-sm fragment" data-animation="fade-up" data-delay="0">PESONA 매핑 / 비용 차별화 angle / 라운드 1-6, 약 6시간 작업.</p>
+    </div>
+    <div class="carousel-grid">
+      <div class="carousel-card fragment" data-animation="fade-up" data-delay="1">
+        <div class="img-slot"><img src="assets/carousel-1.png" alt="성형외과 carousel 1장 Problem"></div>
+        <div class="step-label"><span class="step-num">01</span><span class="step-name">Problem</span></div>
+      </div>
+      <div class="carousel-card fragment" data-animation="fade-up" data-delay="2">
+        <div class="img-slot"><img src="assets/carousel-2.png" alt="성형외과 carousel 2장 Empathy"></div>
+        <div class="step-label"><span class="step-num">02</span><span class="step-name">Empathy</span></div>
+      </div>
+      <div class="carousel-card fragment" data-animation="fade-up" data-delay="3">
+        <div class="img-slot"><img src="assets/carousel-3.png" alt="성형외과 carousel 3장 Offer"></div>
+        <div class="step-label"><span class="step-num">03</span><span class="step-name">Offer</span></div>
+      </div>
+      <div class="carousel-card fragment" data-animation="fade-up" data-delay="4">
+        <div class="img-slot"><img src="assets/carousel-4.png" alt="성형외과 carousel 4장 Action"></div>
+        <div class="step-label"><span class="step-num">04</span><span class="step-name">Action</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 10 — 사례 매핑 -->
+<!-- ============================================ -->
+<section class="slide layout-split" data-transition="fade">
+  <div class="bg-orb-wrap"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+  <div class="slide-content">
+    <div class="split-left">
+      <div class="map-side fragment" data-animation="fade-right" data-delay="0">
+        <span class="map-side-tag">캐논 inject</span>
+        <h3 class="map-side-title">이 4장에 박힌 이론</h3>
+        <div class="map-row"><span class="map-key">AIDA</span><span class="map-arrow">→</span><span class="map-val">4장 흐름 (Problem · Empathy · Offer · Action)</span></div>
+        <div class="map-row"><span class="map-key">Schwartz</span><span class="map-arrow">→</span><span class="map-val">청자 awareness 4-5 단계 (가격에 데인 경험)</span></div>
+        <div class="map-row"><span class="map-key">Ogilvy</span><span class="map-arrow">→</span><span class="map-val">숫자 + 명확성 (30 / 50 / 150)</span></div>
+        <div class="map-row"><span class="map-key">Stories</span><span class="map-arrow">→</span><span class="map-val">캐릭터 (계산기 든 사람) + 디테일 (12줄 옵션)</span></div>
+        <div class="map-row"><span class="map-key">Cialdini</span><span class="map-arrow">→</span><span class="map-val">희소성 (한정) + 권위 (병원 정식 가격표)</span></div>
+      </div>
+    </div>
+    <div class="split-right">
+      <div class="map-side fragment" data-animation="fade-left" data-delay="0">
+        <span class="map-side-tag">모델 매핑</span>
+        <h3 class="map-side-title">어느 단계 어느 모델</h3>
+        <div class="map-row"><span class="map-key">조사</span><span class="map-arrow">→</span><span class="map-val">Gemini 3.1 Pro (메디게이트·메디잡 페인 발굴)</span></div>
+        <div class="map-row"><span class="map-key">회의</span><span class="map-arrow">→</span><span class="map-val">Claude Opus (비용 angle fix)</span></div>
+        <div class="map-row"><span class="map-key">카피</span><span class="map-arrow">→</span><span class="map-val">Opus 5개 + Codex 5개 → 사용자 픽</span></div>
+        <div class="map-row"><span class="map-key">prompt</span><span class="map-arrow">→</span><span class="map-val">Claude 직접 작성 (시각 metaphor)</span></div>
+        <div class="map-row"><span class="map-key">생성</span><span class="map-arrow">→</span><span class="map-val">Codex gpt-image-2 (한국어 텍스트 정확)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 11 — 아마존 적용 + placeholder -->
+<!-- ============================================ -->
+<section class="slide layout-stacked" data-transition="fade">
+  <div class="bg-orb-wrap"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+  <div class="slide-content">
+    <div style="display:flex; flex-direction:column; gap:0.3rem;">
+      <span class="label fragment" data-animation="fade-up" data-delay="0">아마존 적용</span>
+      <h2 class="heading-xl fragment" data-animation="fade-up" data-delay="0">동일 시스템으로 <span class="text-gradient">amazon listing</span> 뽑으면?</h2>
+      <p class="text-sm fragment" data-animation="fade-up" data-delay="0">캐논 inject + 모델 매핑 → 7 필드 출력. 트랙 B 콘솔 빌드 진행 중.</p>
+    </div>
+    <div class="bullet-list">
+      <div class="bullet-item fragment" data-animation="fade-up" data-delay="1">
+        <span class="bullet-num">01</span>
+        <div>
+          <div class="bullet-title">amazon-listing 딥어댑터 inject</div>
+          <p class="bullet-desc">7 필드 spec + A9 알고리즘 + Bullet 5 룰을 prompt context로. AI가 "Title 80자 안 + 키워드 stuffing 금지" 자동 준수.</p>
+        </div>
+      </div>
+      <div class="bullet-item fragment" data-animation="fade-up" data-delay="2">
+        <span class="bullet-num">02</span>
+        <div>
+          <div class="bullet-title">캐논 매핑 — 어느 캐논이 어디로</div>
+          <p class="bullet-desc">AIDA → Bullet 1·2 / Schwartz → Title fold 첫 80자 / Ogilvy → Title 헤드 룰 / Stories → A+ Header 모듈 / Cialdini → Bullet 3 (반론·신뢰).</p>
+        </div>
+      </div>
+      <div class="bullet-item placeholder fragment" data-animation="fade-up" data-delay="3">
+        <span class="bullet-num"><i data-lucide="image"></i></span>
+        <div>
+          <div class="bullet-title">[트랙 B 결과 — 콘솔 /amazon-listing 페이지 스샷]</div>
+          <p class="bullet-desc">MVP-2 빌드 후 흘려넣음. Director's Console 안 실제 input form + output 화면 캡처.</p>
+        </div>
+      </div>
+      <div class="bullet-item placeholder fragment" data-animation="fade-up" data-delay="4">
+        <span class="bullet-num"><i data-lucide="git-compare"></i></span>
+        <div>
+          <div class="bullet-title">[Before / After — 캐논 없을 때 vs 있을 때]</div>
+          <p class="bullet-desc">동일 제품, 동일 모델, prompt만 다르게. 결과 차이를 한눈에 비교.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 12 — Closing (WebGL bg) -->
+<!-- ============================================ -->
+<section class="slide layout-center" data-transition="fade">
+  <div class="webgl-bg-wrap">
+    <canvas class="webgl-bg" data-webgl="closing"></canvas>
+    <div class="slide-bg-overlay"></div>
+  </div>
+  <div class="slide-content">
+    <span class="label fragment" data-animation="fade-up" data-delay="0">마무리</span>
+    <p class="big-quote fragment" data-animation="blur-in" data-delay="0">이게 제 <span class="text-gradient">실험 노트</span>입니다</p>
+    <p class="subtitle fragment" data-animation="fade-up" data-delay="0">테스트는 진행 중. 트랙 A·B 결과는 다음 발표에 흘려넣습니다.</p>
+    <div class="divider fragment" data-animation="scale-in" data-delay="0"></div>
+    <p class="caption fragment" data-animation="fade-up" data-delay="0">감사합니다 / 인비저블웍스</p>
+  </div>
+</section>
+
+<script>
+/* ============================================
+   WebGL background — coral mesh on cream/white base
+   ============================================ */
+(function initWebGL() {
+  var canvases = document.querySelectorAll('canvas.webgl-bg');
+  if (!canvases.length) return;
+  var vertSrc = 'attribute vec2 a_pos; void main(){ gl_Position = vec4(a_pos, 0.0, 1.0); }';
+  var fragSrc = [
+    'precision mediump float;',
+    'uniform vec2 u_res;',
+    'uniform float u_t;',
+    'void main(){',
+    '  vec2 uv = gl_FragCoord.xy / u_res;',
+    /* cream/white base #FAF7F5 */
+    '  vec3 base = vec3(0.980, 0.969, 0.961);',
+    '  vec3 coral = vec3(0.957, 0.713, 0.690);',
+    '  vec3 peach = vec3(0.973, 0.863, 0.784);',
+    '  vec3 paleGreen = vec3(0.910, 0.894, 0.784);',
+    '  float t = u_t * 0.08;',
+    '  vec2 c1 = vec2(0.30 + sin(t * 0.9) * 0.10, 0.42 + cos(t * 0.7) * 0.08);',
+    '  vec2 c2 = vec2(0.70 + sin(t * 0.7) * 0.08, 0.55 + cos(t * 0.9) * 0.10);',
+    '  vec2 c3 = vec2(0.55 + sin(t * 1.2) * 0.06, 0.30 + cos(t * 1.0) * 0.05);',
+    '  float d1 = distance(uv, c1);',
+    '  float d2 = distance(uv, c2);',
+    '  float d3 = distance(uv, c3);',
+    /* softer blur falloff than before — gradient feels like a blur spot */
+    '  float i1 = smoothstep(0.50, 0.0, d1);',
+    '  float i2 = smoothstep(0.46, 0.0, d2);',
+    '  float i3 = smoothstep(0.32, 0.0, d3);',
+    '  vec3 col = base;',
+    '  col = mix(col, coral, i1 * 0.78);',
+    '  vec3 mix23 = mix(peach, paleGreen, sin(u_t * 0.05) * 0.5 + 0.5);',
+    '  col = mix(col, mix23, i2 * 0.62);',
+    '  col = mix(col, peach, i3 * 0.42);',
+    '  gl_FragColor = vec4(col, 1.0);',
+    '}'
+  ].join('\n');
+
+  function compile(gl, src, type) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) return null;
+    return s;
+  }
+
+  canvases.forEach(function(canvas) {
+    var gl = canvas.getContext('webgl', { antialias: false });
+    if (!gl) return;
+    var vs = compile(gl, vertSrc, gl.VERTEX_SHADER);
+    var fs = compile(gl, fragSrc, gl.FRAGMENT_SHADER);
+    if (!vs || !fs) return;
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+    gl.useProgram(prog);
+
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+    var loc = gl.getAttribLocation(prog, 'a_pos');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    var uRes = gl.getUniformLocation(prog, 'u_res');
+    var uT = gl.getUniformLocation(prog, 'u_t');
+
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    function resize() {
+      var w = canvas.clientWidth || canvas.offsetWidth || window.innerWidth;
+      var h = canvas.clientHeight || canvas.offsetHeight || window.innerHeight;
+      canvas.width = Math.max(1, w * dpr);
+      canvas.height = Math.max(1, h * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    var paused = false;
+    var rafId = null;
+    var startTime = performance.now();
+
+    function tick(now) {
+      if (paused) return;
+      var elapsed = (now - startTime) / 1000;
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform1f(uT, elapsed);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      rafId = requestAnimationFrame(tick);
+    }
+    rafId = requestAnimationFrame(tick);
+
+    canvas.addEventListener('webgl-pause', function() { paused = true; if (rafId) cancelAnimationFrame(rafId); });
+    canvas.addEventListener('webgl-resume', function() {
+      if (paused) { paused = false; rafId = requestAnimationFrame(tick); }
+    });
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      paused = true;
+      if (rafId) cancelAnimationFrame(rafId);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform1f(uT, 0);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+  });
+})();
+
+/* ============================================
+   Lucide post-process: wrap svg in <i data-lucide>
+   ============================================ */
+function postProcessLucide() {
+  if (!window.lucide) return;
+  document.querySelectorAll('svg').forEach(function(svg) {
+    if (svg.closest('.bg-noise') || svg.querySelector('filter')) return;
+    var classes = Array.from(svg.classList);
+    var lucideClass = classes.find(function(c) { return c.startsWith('lucide-'); });
+    var isLucideSvg = svg.classList.contains('lucide') || !!lucideClass || svg.hasAttribute('data-lucide');
+    if (!isLucideSvg) return;
+    var iconName = svg.getAttribute('data-lucide')
+      || (lucideClass ? lucideClass.replace('lucide-', '') : 'icon');
+    classes.forEach(function(c) {
+      if (c === 'lucide' || c.startsWith('lucide-')) svg.classList.remove(c);
+    });
+    if (svg.getAttribute('class') === '') svg.removeAttribute('class');
+    svg.removeAttribute('data-lucide');
+    if (!svg.closest('i[data-lucide]')) {
+      var i = document.createElement('i');
+      i.setAttribute('data-lucide', iconName);
+      i.style.display = 'inline-flex';
+      i.style.alignItems = 'center';
+      i.style.justifyContent = 'center';
+      i.style.lineHeight = '0';
+      svg.parentNode.insertBefore(i, svg);
+      i.appendChild(svg);
+    }
+  });
+}
+
+/* ============================================
+   Presentation Engine
+   ============================================ */
+(function() {
+  'use strict';
+
+  function addClasses(el) {
+    var tokens = Array.prototype.slice.call(arguments, 1);
+    var clean = tokens.filter(function(t) { return typeof t === 'string' && t.length > 0; });
+    if (clean.length) el.classList.add.apply(el.classList, clean);
+  }
+  function removeClasses(el) {
+    var tokens = Array.prototype.slice.call(arguments, 1);
+    var clean = tokens.filter(function(t) { return typeof t === 'string' && t.length > 0; });
+    if (clean.length) el.classList.remove.apply(el.classList, clean);
+  }
+
+  var currentSlide = 0;
+  var currentFragment = -1;
+  var slides = document.querySelectorAll('.slide');
+  var totalSlides = slides.length;
+  var isAnimating = false;
+  var TRANSITION_DURATION = 600;
+  var FRAGMENT_ANIM_DURATION = 500;
+
+  function syncCurrentSlide() {
+    var active = document.querySelector('.slide.active');
+    if (!active) return;
+    var idx = Array.prototype.indexOf.call(slides, active);
+    if (idx >= 0) currentSlide = idx;
+  }
+  function syncCurrentFragment() {
+    var frags = getFragments(currentSlide);
+    var lastVisible = -1;
+    for (var i = 0; i < frags.length; i++) {
+      if (frags[i].classList.contains('visible')) lastVisible = i;
+    }
+    currentFragment = lastVisible;
+  }
+  function forceCompleteAutoFragments() {
+    if (!slides[currentSlide]) return;
+    var frags = getFragments(currentSlide);
+    for (var i = 0; i < frags.length; i++) {
+      if (isAutoFragment(frags[i]) && !frags[i].classList.contains('visible')) {
+        showFragment(currentSlide, i, false);
+      }
+    }
+  }
+
+  if (window.location.search.indexOf('print') !== -1) {
+    document.documentElement.classList.add('print-mode');
+    document.body.classList.add('print-mode');
+    document.documentElement.style.overflow = 'visible';
+    document.body.style.overflow = 'visible';
+    document.body.style.height = 'auto';
+    slides.forEach(function(s) {
+      s.style.position = 'relative';
+      s.style.opacity = '1';
+      s.style.pointerEvents = 'auto';
+      s.style.display = 'flex';
+      s.style.height = '100vh';
+      s.style.pageBreakAfter = 'always';
+      s.classList.add('active');
+    });
+    document.querySelectorAll('.fragment').forEach(function(f) {
+      f.style.opacity = '1';
+      f.style.transform = 'none';
+      f.style.filter = 'none';
+      f.classList.add('visible');
+    });
+    document.querySelectorAll('.nav-dots, .progress-bar, .slide-counter, .fragment-hint').forEach(function(el) { el.style.display = 'none'; });
+    if (window.lucide) lucide.createIcons();
+    setTimeout(postProcessLucide, 30);
+    return;
+  }
+
+  function getFragments(slideIndex) { return slides[slideIndex].querySelectorAll('.fragment'); }
+  function getDelayValue(frag) {
+    var d = frag.dataset.delay;
+    if (d === undefined || d === null || d === '') return 0;
+    return parseInt(d, 10);
+  }
+  function isAutoFragment(frag) { return getDelayValue(frag) === 0; }
+  function getFirstClickableIndex(slideIndex) {
+    var frags = getFragments(slideIndex);
+    for (var i = 0; i < frags.length; i++) {
+      if (!isAutoFragment(frags[i])) return i;
+    }
+    return frags.length;
+  }
+
+  function showFragment(slideIndex, fragIndex, animate) {
+    var frag = getFragments(slideIndex)[fragIndex];
+    if (!frag) return;
+    var anim = frag.dataset.animation || 'fade-up';
+    frag.classList.add('visible');
+    if (animate === false) {
+      frag.style.opacity = '1';
+      frag.style.transform = 'none';
+      frag.style.filter = 'none';
+      frag.style.animation = 'none';
+    } else {
+      var keyframeName = 'fragment' + capitalize(kebabToCamel(anim));
+      frag.style.animation = keyframeName + ' ' + FRAGMENT_ANIM_DURATION + 'ms cubic-bezier(0.16, 1, 0.3, 1) forwards';
+    }
+  }
+
+  function hideFragment(slideIndex, fragIndex) {
+    var frag = getFragments(slideIndex)[fragIndex];
+    if (!frag) return;
+    frag.classList.remove('visible');
+    frag.style.animation = '';
+    frag.style.opacity = '0';
+    frag.style.transform = '';
+    frag.style.filter = '';
+  }
+
+  function showAllFragments(slideIndex) {
+    var frags = getFragments(slideIndex);
+    frags.forEach(function(f) {
+      f.classList.add('visible');
+      f.style.opacity = '1';
+      f.style.transform = 'none';
+      f.style.filter = 'none';
+      f.style.animation = 'none';
+    });
+  }
+  function hideAllFragments(slideIndex) {
+    var frags = getFragments(slideIndex);
+    frags.forEach(function(f) {
+      f.classList.remove('visible');
+      f.style.animation = '';
+      f.style.opacity = '0';
+      f.style.transform = '';
+      f.style.filter = '';
+    });
+  }
+
+  function goToSlide(index, direction, skipFragmentSetup) {
+    if (isAnimating || index < 0 || index >= totalSlides || index === currentSlide) return;
+    isAnimating = true;
+    direction = direction || 'forward';
+
+    var from = slides[currentSlide];
+    var to = slides[index];
+    var transition = to.dataset.transition || 'fade';
+
+    var dirClass = direction === 'backward' ? 'backward' : '';
+    addClasses(from, 'exiting', 'transition-' + transition, dirClass);
+    addClasses(to, 'entering', 'transition-' + transition, 'active', dirClass);
+
+    setTimeout(function() {
+      removeClasses(from, 'active', 'exiting', 'transition-' + transition, 'backward');
+      removeClasses(to, 'entering', 'transition-' + transition, 'backward');
+      isAnimating = false;
+    }, TRANSITION_DURATION);
+
+    setTimeout(function() { isAnimating = false; }, TRANSITION_DURATION + 400);
+
+    var fromCanvas = from.querySelector('canvas.webgl-bg');
+    var toCanvas = to.querySelector('canvas.webgl-bg');
+    if (fromCanvas) fromCanvas.dispatchEvent(new Event('webgl-pause'));
+    if (toCanvas) toCanvas.dispatchEvent(new Event('webgl-resume'));
+
+    currentSlide = index;
+
+    if (!skipFragmentSetup) {
+      hideAllFragments(index);
+      if (index === 0) autoPlayFirstSlide(0);
+      else autoShowDelayZeroFragments(index);
+    }
+    updateUI();
+  }
+
+  function autoPlayFirstSlide(slideIndex) {
+    var frags = getFragments(slideIndex);
+    currentFragment = -1;
+    frags.forEach(function(_, i) {
+      setTimeout(function() {
+        showFragment(slideIndex, i, true);
+        currentFragment = i;
+        updateFragmentHint();
+      }, 350 * (i + 1));
+    });
+  }
+  function autoShowDelayZeroFragments(slideIndex) {
+    var frags = getFragments(slideIndex);
+    currentFragment = -1;
+    var autoCount = 0;
+    for (var i = 0; i < frags.length; i++) {
+      if (isAutoFragment(frags[i])) {
+        (function(idx, delay) {
+          setTimeout(function() { showFragment(slideIndex, idx, true); }, delay);
+        })(i, 100 + (autoCount * 150));
+        currentFragment = i;
+        autoCount++;
+      } else break;
+    }
+    setTimeout(function() { updateFragmentHint(); }, 100 + autoCount * 150 + 50);
+  }
+
+  function advance() {
+    syncCurrentSlide();
+    forceCompleteAutoFragments();
+    syncCurrentFragment();
+    isAnimating = false;
+    var frags = getFragments(currentSlide);
+    if (currentFragment < frags.length - 1) {
+      currentFragment++;
+      while (currentFragment < frags.length && frags[currentFragment].classList.contains('visible')) currentFragment++;
+      if (currentFragment < frags.length) {
+        showFragment(currentSlide, currentFragment, true);
+        updateFragmentHint();
+      } else {
+        currentFragment = frags.length - 1;
+        if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1, 'forward');
+      }
+    } else if (currentSlide < totalSlides - 1) {
+      goToSlide(currentSlide + 1, 'forward');
+    }
+  }
+
+  function retreat() {
+    syncCurrentSlide();
+    syncCurrentFragment();
+    isAnimating = false;
+    var frags = getFragments(currentSlide);
+    var firstClickable = getFirstClickableIndex(currentSlide);
+    if (currentFragment >= firstClickable) {
+      hideFragment(currentSlide, currentFragment);
+      currentFragment--;
+      while (currentFragment >= 0 && isAutoFragment(frags[currentFragment])) currentFragment--;
+      if (currentFragment < firstClickable) currentFragment = firstClickable - 1;
+      updateFragmentHint();
+    } else if (currentSlide > 0) {
+      var prevIndex = currentSlide - 1;
+      goToSlide(prevIndex, 'backward', true);
+      hideAllFragments(prevIndex);
+      setTimeout(function() {
+        showAllFragments(prevIndex);
+        var prevFrags = getFragments(prevIndex);
+        currentFragment = prevFrags.length - 1;
+        updateFragmentHint();
+      }, TRANSITION_DURATION + 50);
+    }
+  }
+
+  document.addEventListener('keydown', function(e) {
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'Enter': case 'PageDown':
+        e.preventDefault(); advance(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'Backspace': case 'PageUp':
+        e.preventDefault(); retreat(); break;
+      case 'Home':
+        e.preventDefault();
+        syncCurrentSlide();
+        isAnimating = false;
+        if (currentSlide !== 0) goToSlide(0, 'backward');
+        break;
+      case 'End':
+        e.preventDefault();
+        syncCurrentSlide();
+        isAnimating = false;
+        if (currentSlide !== totalSlides - 1) goToSlide(totalSlides - 1, 'forward');
+        break;
+      case 'f': case 'F':
+        if (!e.ctrlKey && !e.metaKey) toggleFullscreen(); break;
+      case 'Escape':
+        if (document.fullscreenElement) document.exitFullscreen(); break;
+    }
+  });
+
+  var wheelCooldown = false;
+  document.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    if (wheelCooldown) return;
+    wheelCooldown = true;
+    if (e.deltaY > 0) advance(); else if (e.deltaY < 0) retreat();
+    setTimeout(function() { wheelCooldown = false; }, 500);
+  }, { passive: false });
+
+  var touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+    if (dt < 500 && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) advance(); else retreat();
+    }
+  }, { passive: true });
+
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.nav-dots, .nav-dot, button, a, input, select, textarea')) return;
+    if (e.clientX > window.innerWidth * 0.5) advance(); else retreat();
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function() {});
+    else document.exitFullscreen();
+  }
+
+  function updateUI() {
+    var progress = document.querySelector('.progress-bar-fill');
+    if (progress) progress.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+    document.querySelectorAll('.nav-dot').forEach(function(dot, i) {
+      dot.classList.toggle('active', i === currentSlide);
+    });
+    var counter = document.querySelector('.slide-counter');
+    if (counter) {
+      counter.textContent = String(currentSlide + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
+    }
+    updateFragmentHint();
+  }
+
+  function updateFragmentHint() {
+    var hint = document.querySelector('.fragment-hint');
+    if (!hint) return;
+    var frags = getFragments(currentSlide);
+    var hasMore = false;
+    for (var i = 0; i < frags.length; i++) {
+      if (!frags[i].classList.contains('visible')) { hasMore = true; break; }
+    }
+    hint.style.opacity = hasMore ? '1' : '0';
+  }
+
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function kebabToCamel(s) { return s.replace(/-([a-z])/g, function(_, c) { return c.toUpperCase(); }); }
+
+  function init() {
+    if (slides[0]) slides[0].classList.add('active');
+    document.querySelectorAll('.fragment').forEach(function(f) { f.style.opacity = '0'; });
+    buildDotNav();
+    updateUI();
+    autoPlayFirstSlide(0);
+    document.querySelectorAll('canvas.webgl-bg').forEach(function(c) {
+      if (!c.closest('.slide').classList.contains('active')) {
+        c.dispatchEvent(new Event('webgl-pause'));
+      }
+    });
+    if (window.lucide) lucide.createIcons();
+    setTimeout(postProcessLucide, 30);
+    setTimeout(postProcessLucide, 200);
+  }
+
+  function buildDotNav() {
+    var nav = document.querySelector('.nav-dots');
+    if (!nav) return;
+    for (var i = 0; i < totalSlides; i++) {
+      var dot = document.createElement('button');
+      dot.className = 'nav-dot';
+      dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+      (function(idx) {
+        dot.addEventListener('click', function(e) {
+          e.stopPropagation();
+          goToSlide(idx, idx > currentSlide ? 'forward' : 'backward');
+        });
+      })(i);
+      nav.appendChild(dot);
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+</body>
+</html>

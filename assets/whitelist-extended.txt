@@ -1,0 +1,194 @@
+# Extended whitelist for 아마존 웨비나 presentation
+# Includes base whitelist + custom classes for diagrams, bullet lists,
+# matrix tables, carousel grid, mapping panels.
+
+# --- Base whitelist (copied verbatim) ---
+slide
+slide-content
+active
+entering
+exiting
+layout-center
+layout-split
+layout-grid
+layout-fullbleed
+layout-quote
+layout-stacked
+layout-image-bg
+layout-compare
+split-left
+split-right
+card-grid
+cols-2
+cols-3
+cols-4
+compare-side
+compare-vs
+timeline
+timeline-item
+flow
+flow-step
+flow-arrow
+heading-hero
+heading-xl
+heading-lg
+heading-md
+heading-sm
+text-body
+text-lg
+text-sm
+text-xs
+text-gradient
+text-gradient-custom
+label
+subtitle
+caption
+quote
+attribution
+hl
+mark-accent
+tag
+tag-success
+tag-warning
+tag-danger
+card
+card-glass
+card-accent
+card-icon
+card-icon-lg
+stat-card
+stat-number
+stat-label
+badge
+divider
+text-accent
+text-dim
+text-mono
+text-muted
+h-list
+h-list-item
+md
+img-slot
+slide-bg-image
+slide-bg-overlay
+embed-fallback
+play-overlay
+external-link
+bg-orb
+bg-grid
+bg-dots
+bg-gradient-mesh
+bg-noise
+bg-vignette
+nav-dots
+nav-dot
+progress-bar
+progress-bar-fill
+slide-counter
+fragment-hint
+fragment
+visible
+transition-fade
+transition-slide-left
+transition-slide-right
+transition-slide-up
+transition-zoom
+transition-flip
+transition-morph
+transition-push
+transition-reveal
+backward
+print-mode
+light
+broken
+morph-merge
+
+# --- Custom additions for this presentation ---
+# WebGL background
+webgl-bg
+webgl-bg-wrap
+has-webgl
+
+# Bg orb wrapper (added 2026-05-06 redesign)
+bg-orb-wrap
+
+# 3-layer system diagram (slide 3)
+diagram-stack
+diagram-layer
+layer-canon
+layer-tag
+layer-name
+layer-desc
+layer-cycle
+
+# Numbered bullet list (slides 5, 8, 11)
+bullet-list
+bullet-item
+bullet-num
+bullet-title
+bullet-desc
+placeholder
+
+# Amazon 7-fields list (slide 6)
+field-list
+field-row
+field-num
+field-name
+field-spec
+
+# Placeholder panel (slide 6, 11)
+placeholder-panel
+placeholder-icon
+placeholder-label
+placeholder-desc
+
+# Model matrix table (slide 7)
+matrix-table
+matrix-model
+matrix-fail
+
+# Carousel result grid (slide 9)
+carousel-grid
+carousel-card
+step-label
+step-num
+step-name
+
+# Canon-model mapping panels (slide 10)
+map-side
+map-side-tag
+map-side-title
+map-row
+map-key
+map-arrow
+map-val
+
+# Closing big quote (slide 12)
+big-quote
+
+# Slide 4 compact mode
+compact-cards
+
+# --- Lucide library auto-applied classes (svg) ---
+# lucide.createIcons() replaces <i data-lucide> with <svg class="lucide lucide-<name>">.
+# We post-process to wrap back in <i> AND strip these classes, but include
+# the most common ones here as a safety net.
+lucide
+lucide-shuffle
+lucide-dices
+lucide-rotate-ccw
+lucide-layout-grid
+lucide-megaphone
+lucide-layers
+lucide-target
+lucide-book-open
+lucide-hand
+lucide-grid
+lucide-package
+lucide-git-branch
+lucide-x
+lucide-zap
+lucide-alert-triangle
+lucide-image
+lucide-git-compare
+lucide-play
